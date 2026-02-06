@@ -22,6 +22,17 @@ export class MovementAction {
    * @returns {Object} Estado del movimiento { velocityX, velocityY, isMoving, direction }
    */
   execute(sprite, keys, isOnGround = true) {
+    // Verificar que el sprite y su phaserSprite existan
+    if (!sprite || !sprite.phaserSprite || !sprite.phaserSprite.body) {
+      return {
+        velocityX: 0,
+        velocityY: 0,
+        isMoving: false,
+        direction: 0,
+        isOnGround: true
+      }
+    }
+
     const { left, right, up, down, space } = keys
     const isLeftPressed = left?.isDown || false
     const isRightPressed = right?.isDown || false
@@ -46,16 +57,14 @@ export class MovementAction {
     }
 
     // Salto (solo si está en el suelo y está permitido)
-    if (this.config.allowJump && isJumpPressed && isOnGround && sprite.phaserSprite.body) {
+    if (this.config.allowJump && isJumpPressed && isOnGround) {
       velocityY = this.config.jumpSpeed
     }
 
     // Aplicar velocidades
-    if (sprite.phaserSprite.body) {
-      sprite.phaserSprite.setVelocityX(velocityX)
-      if (velocityY !== 0) {
-        sprite.phaserSprite.setVelocityY(velocityY)
-      }
+    sprite.phaserSprite.setVelocityX(velocityX)
+    if (velocityY !== 0) {
+      sprite.phaserSprite.setVelocityY(velocityY)
     }
 
     return {
