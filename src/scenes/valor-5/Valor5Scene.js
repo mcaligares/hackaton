@@ -23,7 +23,7 @@ export class Valor5Scene extends ChallengeScene {
     // Configuración del juego (puede ser pasado por init())
     this.config = {
       timeLimit: 30000, // 30 segundos en ms (configurable)
-      distanceToB: 10000, // Distancia del punto A al B en px
+      distanceToB: 5000, // Distancia del punto A al B en px
       baseSpeed: 50, // Velocidad base al presionar espacio
       maxSpeed: 800, // Velocidad máxima alcanzable
       speedIncrement: 10, // Incremento de velocidad por presión de espacio
@@ -32,7 +32,7 @@ export class Valor5Scene extends ChallengeScene {
       boostMultiplier: 1.5, // Multiplicador de velocidad del boost
       boostDuration: 2000, // Duración del boost en ms
       obstaclePenalty: 0.7, // Porcentaje de velocidad que se pierde al chocar (0-1) - ahora reduce considerablemente
-      totalObstacles: 20,
+      totalObstacles: 10,
     }
 
     // Configuración de assets (fácil de cambiar cuando tengas los PNGs)
