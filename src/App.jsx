@@ -3,19 +3,8 @@ import Phaser from 'phaser'
 import { useGameState } from './hooks/useGameState.js'
 import { SceneRouter, sceneConfig } from './core/router/index.js'
 
-// Importar todas las escenas
-import {
-  AerolabIntroScene,
-  MainMenuScene,
-  IntroStoryScene,
-  TutorialScene,
-  ExplorationScene,
-  AchievementScene,
-  Achievement2Scene,
-  Story1Scene,
-  CombatScene,
-  EndGameScene
-} from './scenes/index.js'
+// Importar configuración de escenas
+import { allScenes } from './config/scenes/index.js'
 
 function App() {
   const gameRef = useRef(null)
@@ -37,18 +26,7 @@ function App() {
           debug: false
         }
       },
-      scene: [
-        AerolabIntroScene,
-        MainMenuScene,
-        IntroStoryScene,
-        TutorialScene,
-        ExplorationScene,
-        AchievementScene,
-        Achievement2Scene,
-        Story1Scene,
-        CombatScene,
-        EndGameScene
-      ]
+      scene: allScenes
     }
 
     // Crear instancia del juego

@@ -766,8 +766,7 @@ export class Valor5Scene extends ChallengeScene {
     
     // Transición después de 2 segundos
     this.time.delayedCall(2000, () => {
-      // Aquí puedes agregar la transición a la siguiente escena
-      // this.transitionTo('NextScene')
+      this.transitionTo('Valor5Completed')
     })
   }
 
@@ -775,12 +774,17 @@ export class Valor5Scene extends ChallengeScene {
     if (this.isGameOver) return
     
     this.isGameOver = true
-    this.gameOverText.setText('TIEMPO AGOTADO\nPresiona ENTER para reiniciar')
+    this.gameOverText.setText('TIEMPO AGOTADO')
     this.gameOverText.setFill('#FF0000')
     this.gameOverText.setVisible(true)
     
     this.timer.remove()
     this.failChallenge()
+    
+    // Transición después de 2 segundos
+    this.time.delayedCall(2000, () => {
+      this.transitionTo('Valor5Failed')
+    })
   }
 
   onChallengeComplete() {
