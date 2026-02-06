@@ -144,7 +144,10 @@ export class Valor1ChallengeScene extends ChallengeScene {
     instructionsText.setDepth(1000)
     instructionsText.setAlpha(0.9)
 
-    // 11. Configurar objetivos
+    // 11. Crear botón SKIP
+    this.createSkipButton()
+
+    // 12. Configurar objetivos
     this.setupObjectives()
   }
 
@@ -894,13 +897,105 @@ export class Valor1ChallengeScene extends ChallengeScene {
     }
   }
 
+  createSkipButton() {
+    // Botón SKIP en la esquina superior derecha
+    const skipButtonBg = this.add.rectangle(750, 30, 80, 35, 0x666666, 0.7)
+    skipButtonBg.setInteractive({ useHandCursor: true })
+    skipButtonBg.setDepth(1001)
+    skipButtonBg.setStrokeStyle(1, 0xffffff, 0.5)
+
+    const skipButtonText = this.add.text(750, 30, 'SKIP', {
+      fontSize: '14px',
+      fill: '#ffffff',
+      fontStyle: 'bold',
+      fontFamily: 'Arial'
+    })
+    skipButtonText.setOrigin(0.5)
+    skipButtonText.setDepth(1002)
+
+    // Efecto hover
+    skipButtonBg.on('pointerover', () => {
+      skipButtonBg.setFillStyle(0x888888, 0.9)
+      skipButtonBg.setScale(1.05)
+    })
+
+    skipButtonBg.on('pointerout', () => {
+      skipButtonBg.setFillStyle(0x666666, 0.7)
+      skipButtonBg.setScale(1)
+    })
+
+    // Click para saltar nivel
+    skipButtonBg.on('pointerdown', () => {
+      this.skipLevel()
+    })
+
+    // También permitir saltar con tecla S
+    this.input.keyboard.once('keydown-S', () => {
+      this.skipLevel()
+    })
+
+    this.skipButton = skipButtonBg
+    this.skipButtonText = skipButtonText
+  }
+
+  skipLevel() {
+    // Colocar todos los items en sus slots correctos automáticamente
+    Object.keys(this.spheres).forEach(sphereKey => {
+      const sphere = this.spheres[sphereKey]
+      const config = this.spheresConfig[sphereKey]
+      
+      // Para cada item de este sphere, colocarlo en su slot correcto
+      config.items.forEach(itemConfig => {
+        // Buscar el item en la lista
+        const item = this.items.find(i => i.id === itemConfig.id)
+        if (!item) return
+        
+        // Buscar el slot correcto (por orden)
+        const slot = sphere.slots.find(s => s.order === itemConfig.order)
+        if (!slot || slot.item) return // Slot no encontrado o ya ocupado
+        
+        // Si el item está siendo llevado, soltarlo primero
+        if (this.carriedItem === item) {
+          this.carriedItem = null
+        }
+        
+        // Colocar el item en el slot
+        item.state = 'placed'
+        item.placedInSlot = slot
+        item.sprite.x = slot.x
+        item.sprite.y = slot.y
+        item.text.x = slot.x
+        item.text.y = slot.y
+        item.sprite.body.setAllowGravity(false)
+        item.sprite.body.setVelocity(0, 0)
+        item.sprite.body.setImmovable(true)
+        slot.item = item
+      })
+    })
+    
+    // Marcar todos los spheres como completados
+    Object.keys(this.spheres).forEach(sphereKey => {
+      const sphere = this.spheres[sphereKey]
+      sphere.completed = true
+      sphere.checkMark.setVisible(true)
+      sphere.xMark.setVisible(false)
+    })
+    
+    // Completar el objetivo
+    if (!this.allCompleted) {
+      this.allCompleted = true
+      this.completeObjective('complete_all_spheres')
+      this.showAchievementMessage()
+    }
+  }
+
   showAchievementMessage() {
     // Crear overlay oscuro
     const overlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.8)
     overlay.setDepth(1000)
 
     // Mensaje de logro
-    const achievementText = this.add.text(400, 250, '¡Felicidades!', {
+    const achievementText = this.add.text(400, 250, '¡Completaste el desafio!', {
       fontSize: '36px',
       fill: '#ffffff',
       fontFamily: 'Arial',
@@ -909,7 +1004,7 @@ export class Valor1ChallengeScene extends ChallengeScene {
     achievementText.setOrigin(0.5)
     achievementText.setDepth(1001)
 
-    const messageText = this.add.text(400, 300, 'Has desbloqueado el logro:\n"We aim to be our best"', {
+    const messageText = this.add.text(400, 300, ' Felicidades, desbloqueaste tu primer valor Aerolaber!\n We aim to be our best"', {
       fontSize: '24px',
       fill: '#ffff00',
       fontFamily: 'Arial',
