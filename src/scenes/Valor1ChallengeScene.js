@@ -24,6 +24,7 @@ export class Valor1ChallengeScene extends ChallengeScene {
         name: 'DEV SPHERE',
         y: 150,
         x: 500,
+        color: 0x4a90e2, // Color base azul (primer item)
         items: [
           { id: 'dev_1', name: 'Arquitectura', order: 1, color: 0x4a90e2 },
           { id: 'dev_2', name: 'Desarrollo', order: 2, color: 0x5ba3f5 },
@@ -35,6 +36,7 @@ export class Valor1ChallengeScene extends ChallengeScene {
         name: 'DESIGN SPHERE',
         y: 300,
         x: 450,
+        color: 0xe24a90, // Color base rosa/magenta (primer item)
         items: [
           { id: 'design_1', name: 'Investigación', order: 1, color: 0xe24a90 },
           { id: 'design_2', name: 'Wireframes', order: 2, color: 0xf55ba3 },
@@ -46,11 +48,12 @@ export class Valor1ChallengeScene extends ChallengeScene {
         name: 'PM SPHERE',
         y: 450,
         x: 400,
+        color: 0x4a8e2a, // Color base verde oscuro (primer item)
         items: [
-          { id: 'pm_1', name: 'Validación scope', order: 1, color: 0x90e24a },
-          { id: 'pm_2', name: 'Armado de roadmap', order: 2, color: 0xa3f55b },
-          { id: 'pm_3', name: 'Coordinación', order: 3, color: 0xb6ff6c },
-          { id: 'pm_4', name: 'Comunicación cliente', order: 4, color: 0xc7ff7d }
+          { id: 'pm_1', name: 'Validación scope', order: 1, color: 0x4a8e2a },
+          { id: 'pm_2', name: 'Armado de roadmap', order: 2, color: 0x5ba33b },
+          { id: 'pm_3', name: 'Coordinación', order: 3, color: 0x6cb84c },
+          { id: 'pm_4', name: 'Comunicación cliente', order: 4, color: 0x7dc75d }
         ]
       }
     }
@@ -67,6 +70,9 @@ export class Valor1ChallengeScene extends ChallengeScene {
   preload() {
     super.preload()
     
+    // Cargar fondo
+    this.load.image('bg-1', '/assets/backgrounds/bg-1.png')
+    
     // Cargar sprites de Robert
     for (let i = 1; i <= 15; i++) {
       const key = `robert_sprite_${i}`
@@ -81,8 +87,16 @@ export class Valor1ChallengeScene extends ChallengeScene {
   create() {
     super.create()
 
-    // 1. Fondo azul cielo (como ExplorationScene)
-    this.add.rectangle(400, 300, 800, 600, 0x87CEEB)
+    // 1. Fondo - usar bg-1 si está disponible, sino fallback azul cielo
+    if (this.textures.exists('bg-1')) {
+      const bg = this.add.image(400, 300, 'bg-1')
+      bg.setOrigin(0.5, 0.5)
+      bg.setDisplaySize(800, 600)
+      bg.setDepth(0)
+    } else {
+      // Fallback: fondo azul cielo (como ExplorationScene)
+      this.add.rectangle(400, 300, 800, 600, 0x87CEEB).setDepth(0)
+    }
 
     // 2. Crear plataformas base (suelo)
     this.createGround()
@@ -117,7 +131,20 @@ export class Valor1ChallengeScene extends ChallengeScene {
     this.itemTitleText.setVisible(false)
     this.itemTitleText.setDepth(1000)
 
-    // 10. Configurar objetivos
+    // 10. Instrucciones de controles
+    const instructionsText = this.add.text(400, 20, '[E] Agarrar/Soltar objetos  |  [Flechas] Mover y Saltar', {
+      fontSize: '16px',
+      fill: '#ffffff',
+      fontFamily: 'Arial',
+      backgroundColor: '#000000',
+      padding: { x: 15, y: 8 },
+      align: 'center'
+    })
+    instructionsText.setOrigin(0.5)
+    instructionsText.setDepth(1000)
+    instructionsText.setAlpha(0.9)
+
+    // 11. Configurar objetivos
     this.setupObjectives()
   }
 
@@ -315,10 +342,10 @@ export class Valor1ChallengeScene extends ChallengeScene {
       // NO crear rectángulo del sphere - las plataformas ya son visibles
       // Solo crear el texto del nombre del sphere
 
-      // Texto del nombre del sphere
+      // Texto del nombre del sphere en negro
       const sphereText = this.add.text(sphereX, config.y - 35, config.name, {
         fontSize: '20px',
-        fill: '#ffffff',
+        fill: '#000000',
         fontFamily: 'Arial',
         fontStyle: 'bold'
       })
@@ -336,9 +363,9 @@ export class Valor1ChallengeScene extends ChallengeScene {
         const slotX = startX + (i * slotSpacing)
         const slotY = config.y
         
-        // Crear slot con fondo transparente pero bordes visibles
+        // Crear slot con fondo transparente pero bordes visibles con color del sphere
         const slotRect = this.add.graphics()
-        slotRect.lineStyle(2, 0xffffff, 1) // Borde blanco visible
+        slotRect.lineStyle(2, config.color, 1) // Borde con color del sphere
         slotRect.strokeRect(-slotWidth/2, -slotHeight/2, slotWidth, slotHeight)
         slotRect.setPosition(slotX, slotY)
         slotRect.setDepth(1)
@@ -380,12 +407,29 @@ export class Valor1ChallengeScene extends ChallengeScene {
       checkMark.setVisible(false)
       checkMark.setDepth(10)
 
+      // Crear X mark (inicialmente invisible) - para indicar que está mal ordenado
+      const xMark = this.add.text(
+        platformStartX + sphereWidth - 30,
+        config.y,
+        '✗',
+        {
+          fontSize: '32px',
+          fill: '#ff0000',
+          fontFamily: 'Arial',
+          fontStyle: 'bold'
+        }
+      )
+      xMark.setOrigin(0.5)
+      xMark.setVisible(false)
+      xMark.setDepth(10)
+
       this.spheres[sphereKey] = {
         key: sphereKey,
         config: config,
         text: sphereText,
         slots: slots,
         checkMark: checkMark,
+        xMark: xMark,
         completed: false
       }
     })
@@ -465,7 +509,7 @@ export class Valor1ChallengeScene extends ChallengeScene {
 
   createPlayer() {
     // Crear player en el suelo, sin delays
-    this.player = new RobertSprite(this, 100, 0, { scale: 0.3, originY: 0.2 }) // Y: 0, la física lo pondrá en el suelo
+    this.player = new RobertSprite(this, 100, 0, { scale: 0.3, hitboxOffsetY: 100}) // Y: 0, la física lo pondrá en el suelo
     
     // Agregar collider con plataformas inmediatamente
     this.physics.add.collider(this.player.phaserSprite, this.platforms)
@@ -547,6 +591,32 @@ export class Valor1ChallengeScene extends ChallengeScene {
     this.checkSphereCompletion()
   }
 
+  isItemCorrectlyPlaced(item) {
+    // Verificar si el item está correctamente colocado en su slot
+    if (item.state !== 'placed' || !item.placedInSlot) {
+      return false
+    }
+
+    const slot = item.placedInSlot
+    
+    // Buscar en qué sphere está este slot
+    let slotSphereKey = null
+    Object.keys(this.spheres).forEach(sphereKey => {
+      const sphere = this.spheres[sphereKey]
+      if (sphere.slots.includes(slot)) {
+        slotSphereKey = sphereKey
+      }
+    })
+    
+    // Si no se encontró el sphere, no está correctamente colocado
+    if (!slotSphereKey) {
+      return false
+    }
+    
+    // Verificar que el item está en el sphere correcto y en el orden correcto
+    return item.sphere === slotSphereKey && item.order === slot.order
+  }
+
   handleItemInteraction() {
     const playerX = this.player.phaserSprite.x
     const playerY = this.player.phaserSprite.y
@@ -558,7 +628,16 @@ export class Valor1ChallengeScene extends ChallengeScene {
       let nearestDistance = pickupRange
 
       this.items.forEach(item => {
-        if (item.state === 'carried' || item.state === 'placed') return
+        // No se puede agarrar si está siendo llevado
+        if (item.state === 'carried') return
+        
+        // Si está colocado, solo se puede agarrar si está incorrectamente colocado
+        if (item.state === 'placed') {
+          if (this.isItemCorrectlyPlaced(item)) {
+            return // No se puede agarrar si está correctamente colocado
+          }
+          // Si está incorrectamente colocado, se puede agarrar
+        }
 
         const distance = Phaser.Math.Distance.Between(
           playerX,
@@ -650,6 +729,7 @@ export class Valor1ChallengeScene extends ChallengeScene {
       // Marcar el sphere como no completado
       sphere.completed = false
       sphere.checkMark.setVisible(false)
+      sphere.xMark.setVisible(false)
       
       // Reactivar física cuando se remueve del slot
       item.sprite.body.setImmovable(false)
@@ -750,37 +830,59 @@ export class Valor1ChallengeScene extends ChallengeScene {
     Object.keys(this.spheres).forEach(sphereKey => {
       const sphere = this.spheres[sphereKey]
 
-      // Verificar si todos los slots tienen items y están en el orden correcto
-      let allCorrect = true
+      // Verificar si todos los slots tienen items
+      let allSlotsFilled = true
       for (let i = 0; i < sphere.slots.length; i++) {
-        const slot = sphere.slots[i]
-        if (!slot.item) {
-          allCorrect = false
-          break
-        }
-
-        // Verificar que el item es del sphere correcto y tiene el orden correcto
-        if (slot.item.sphere !== sphereKey || slot.item.order !== slot.order) {
-          allCorrect = false
+        if (!sphere.slots[i].item) {
+          allSlotsFilled = false
           break
         }
       }
 
-      if (allCorrect && !sphere.completed) {
-        sphere.completed = true
+      // Verificar si todos los slots tienen items y están en el orden correcto
+      let allCorrect = true
+      if (allSlotsFilled) {
+        for (let i = 0; i < sphere.slots.length; i++) {
+          const slot = sphere.slots[i]
+          
+          // Verificar que el item es del sphere correcto y tiene el orden correcto
+          if (slot.item.sphere !== sphereKey || slot.item.order !== slot.order) {
+            allCorrect = false
+            break
+          }
+        }
+      } else {
+        allCorrect = false
+      }
+
+      // Mostrar check mark si está todo correcto
+      if (allCorrect) {
+        if (!sphere.completed) {
+          sphere.completed = true
+          // Efecto visual solo cuando se completa por primera vez
+          this.tweens.add({
+            targets: sphere.checkMark,
+            scaleX: 1.5,
+            scaleY: 1.5,
+            duration: 200,
+            yoyo: true
+          })
+        }
+        // Siempre mostrar check mark si está todo correcto
         sphere.checkMark.setVisible(true)
-        
-        // Efecto visual
-        this.tweens.add({
-          targets: sphere.checkMark,
-          scaleX: 1.5,
-          scaleY: 1.5,
-          duration: 200,
-          yoyo: true
-        })
-      } else if (!allCorrect && sphere.completed) {
+        sphere.xMark.setVisible(false)
+      } else {
+        // Si no está todo correcto, ocultar check mark
         sphere.completed = false
         sphere.checkMark.setVisible(false)
+        
+        if (allSlotsFilled && !allCorrect) {
+          // Si hay 4 items pero están mal ordenados, mostrar X roja
+          sphere.xMark.setVisible(true)
+        } else {
+          // Si no hay 4 items, ocultar X también
+          sphere.xMark.setVisible(false)
+        }
       }
     })
 

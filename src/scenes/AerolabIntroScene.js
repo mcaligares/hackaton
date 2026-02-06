@@ -17,6 +17,22 @@ export class AerolabIntroScene extends PresentationScene {
   preload() {
     super.preload()
 
+    // Cargar fondo
+    console.log('🖼️ Cargando fondo bg-1 desde: /assets/backgrounds/bg-1.png')
+    this.load.image('bg-1', '/assets/backgrounds/bg-1.png')
+    
+    // Listener para cuando la imagen se carga correctamente
+    this.load.on('filecomplete-image-bg-1', () => {
+      console.log('✅ Imagen bg-1 cargada exitosamente')
+    })
+    
+    // Listener para errores de carga
+    this.load.on('loaderror', (file) => {
+      if (file.key === 'bg-1') {
+        console.error('❌ Error al cargar bg-1:', file.src)
+      }
+    })
+
     // Cargar sprites de Limpa (1-5 para movimiento, 6-11 para interacción)
     for (let i = 1; i <= 11; i++) {
       const key = `limpa_sprite_${i}`
@@ -31,6 +47,9 @@ export class AerolabIntroScene extends PresentationScene {
       this.load.image(key, path)
     }
 
+    // Cargar sprite de Aero
+    this.load.image('sprite_aero', '/assets/sprite_aero.png')
+
     // Verificar carga completa
     this.load.on('complete', () => {
       console.log('✅ All sprites loaded')
@@ -43,9 +62,25 @@ export class AerolabIntroScene extends PresentationScene {
 
   create() {
     super.create()
+    
+    console.log('🎬 AerolabIntroScene.create() ejecutándose')
+    console.log('📋 Texturas disponibles:', Object.keys(this.textures.list))
 
-    // Fondo oscuro elegante
-    this.add.rectangle(400, 300, 800, 600, 0x0a0a0a)
+    // Fondo - usar bg-1 si está disponible, sino fallback
+    if (this.textures.exists('bg-1')) {
+      console.log('✅ Textura bg-1 existe, creando imagen...')
+      const bg = this.add.image(400, 300, 'bg-1')
+      bg.setOrigin(0.5, 0.5) // Centrar el origen
+      bg.setDisplaySize(800, 600) // Ajustar al tamaño del canvas
+      bg.setDepth(0) // Asegurar que esté detrás de todo
+      console.log('✅ Fondo bg-1 creado correctamente en posición (400, 300)')
+    } else {
+      console.error('❌ Error: bg-1 no encontrado en texturas')
+      console.log('📋 Texturas disponibles:', Object.keys(this.textures.list))
+      // Fallback: fondo oscuro elegante
+      this.add.rectangle(400, 300, 800, 600, 0x0a0a0a).setDepth(0)
+      console.log('⚠️ Usando fondo de fallback (rectángulo oscuro)')
+    }
 
     // Crear botón SKIP (temporal, se quitará después)
     this.createSkipButton()
@@ -79,11 +114,11 @@ export class AerolabIntroScene extends PresentationScene {
   createCharacters() {
     // Posición inicial de Limpa (izquierda)
     const limpaStartX = 50
-    const limpaY = 400
+    const limpaY = 550
 
     // Posición de Robert (derecha)
     const robertX = 650
-    const robertY = 400
+    const robertY = 550
 
     // Verificar que las texturas estén cargadas antes de crear los sprites
     if (!this.textures.exists('limpa_sprite_1')) {
@@ -107,6 +142,10 @@ export class AerolabIntroScene extends PresentationScene {
     this.limpa = new LimpaSprite(this, limpaStartX, limpaY, {
       physics: false
     })
+    // Asegurar que Limpa esté por encima del fondo pero debajo de los textos
+    if (this.limpa.phaserSprite) {
+      this.limpa.phaserSprite.setDepth(10)
+    }
     console.log('Limpa created with texture:', this.limpa.phaserSprite.texture.key)
 
     // Crear Robert (sin física) - asegurarse de usar la clave correcta
@@ -114,6 +153,10 @@ export class AerolabIntroScene extends PresentationScene {
     this.robert = new RobertSprite(this, robertX, robertY, {
       physics: false
     })
+    // Asegurar que Robert esté por encima del fondo pero debajo de los textos
+    if (this.robert.phaserSprite) {
+      this.robert.phaserSprite.setDepth(10)
+    }
     console.log('Robert created with texture:', this.robert.phaserSprite.texture.key)
 
     // Verificar que los sprites se crearon correctamente
@@ -198,7 +241,7 @@ export class AerolabIntroScene extends PresentationScene {
     // Crear texto narrativo (inicialmente invisible)
     this.narrativeText = this.add.text(400, 150, '', {
       fontSize: '24px',
-      fill: '#ffffff',
+      fill: '#000000',
       align: 'center',
       wordWrap: { width: 700 },
       fontFamily: 'Arial, sans-serif'
@@ -221,6 +264,11 @@ export class AerolabIntroScene extends PresentationScene {
 
     const text = this.narrativeTexts[this.currentTextIndex]
     
+    // Si es el texto "Así nació Aerolab." (último texto, índice 14), mostrar sprite de Aero
+    if (this.currentTextIndex === 14 && text === 'Así nació Aerolab.') {
+      this.showAeroSprite()
+    }
+    
     // Fade out del texto anterior si existe
     if (this.currentTextIndex > 0 && this.narrativeText.alpha > 0) {
       this.tweens.add({
@@ -236,6 +284,31 @@ export class AerolabIntroScene extends PresentationScene {
       // Primer texto o texto nuevo
       this.narrativeText.setText(text)
       this.fadeInText()
+    }
+  }
+
+  showAeroSprite() {
+    // Verificar que la textura existe
+    if (!this.textures.exists('sprite_aero')) {
+      console.warn('⚠️ sprite_aero no encontrado')
+      return
+    }
+
+    // Crear sprite de Aero en el centro de la pantalla
+    if (!this.aeroSprite) {
+      this.aeroSprite = this.add.sprite(400, 300, 'sprite_aero')
+      this.aeroSprite.setOrigin(0.5)
+      this.aeroSprite.setScale(0.3)
+      this.aeroSprite.setAlpha(0)
+      this.aeroSprite.setDepth(50) // Por encima del fondo pero debajo del texto
+
+      // Fade in del sprite
+      this.tweens.add({
+        targets: this.aeroSprite,
+        alpha: 1,
+        duration: 800,
+        ease: 'Power2'
+      })
     }
   }
 

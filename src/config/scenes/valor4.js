@@ -1,19 +1,20 @@
 /**
  * Configuración de escenas de Valor4
  * 
- * Este archivo contiene todas las escenas relacionadas con Valor4.
- * Si necesitas agregar nuevas escenas de Valor4, agrégalas aquí.
+ * Valor 4: "We aren't afraid to fuck up"
+ * 
+ * Mini-juego: Fail Forward Arena
+ * - Robert vs Limpa en combate
+ * - El jugador DEBE perder la primera vez
+ * - Mensaje: "Failure is part of learning. Keep going."
  */
 
-// Importar escenas de Valor4 cuando las crees
-// import { Valor4Scene, Valor4IntroScene } from '../../scenes/index.js'
+import { Valor4ChallengeScene, Achievement4Scene } from '../../scenes/index.js'
 
 /**
  * Array de escenas de Valor4
- * Agrega tus nuevas escenas de Valor4 aquí
  */
 export const valor4Scenes = [
-  // Ejemplo:
-  // Valor4Scene,
-  // Valor4IntroScene,
+  Valor4ChallengeScene,
+  Achievement4Scene
 ]
