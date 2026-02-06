@@ -15,6 +15,9 @@ export class MainMenuScene extends PresentationScene {
   preload() {
     super.preload()
     
+    // Cargar fondo del menú
+    this.load.image('bg-menu', '/assets/backgrounds/bg-menu.png')
+    
     // Cargar sprite de Aero
     this.load.image('sprite_aero', '/assets/sprite_aero.png')
   }
@@ -22,8 +25,16 @@ export class MainMenuScene extends PresentationScene {
   create() {
     super.create()
 
-    // Fondo
-    this.add.rectangle(400, 300, 800, 600, 0x1a1a1a)
+    // Fondo - usar imagen de assets si está disponible, sino fallback
+    if (this.textures.exists('bg-menu')) {
+      const bgImage = this.add.image(400, 300, 'bg-menu')
+      bgImage.setOrigin(0.5)
+      // Ajustar escala si es necesario para que cubra toda la pantalla
+      bgImage.setDisplaySize(800, 600)
+    } else {
+      // Fallback: rectángulo de color si la imagen no se carga
+      this.add.rectangle(400, 300, 800, 600, 0x1a1a1a)
+    }
 
     // Sprite de Aero arriba del título
     if (this.textures.exists('sprite_aero')) {
@@ -31,24 +42,38 @@ export class MainMenuScene extends PresentationScene {
       aeroSprite.setOrigin(0.5)
       // Ajustar escala si es necesario
       aeroSprite.setScale(0.2)
+      // Z-index más alto que todo
+      aeroSprite.setDepth(20)
     }
 
+    // Fondo blanco transparente para el título
+    const titleBg = this.add.rectangle(400, 150, 580, 100, 0xffffff, 0.8)
+    titleBg.setOrigin(0.5)
+    titleBg.setDepth(10)
+    
     // Título
-    this.add.text(400, 180, 'Aerolab Onboarding', {
+    const titleText = this.add.text(400, 150, 'Aerolab Onboarding', {
       fontSize: '48px',
-      fill: '#ffffff',
+      fill: '#000000',
       fontStyle: 'bold'
     }).setOrigin(0.5)
+    titleText.setDepth(11)
 
     // Descripción
     const description = 'Sabemos que empezar un nuevo trabajo puede traer inquietudes, por eso hemos creado este pequeño juego para que conozcas la historia de Aero y los valores que representa.\n\nTe deseamos suerte y que lo disfrutes!'
     
-    this.add.text(400, 280, description, {
+    // Fondo blanco transparente para la descripción
+    const descriptionBg = this.add.rectangle(400, 280, 720, 180, 0xffffff, 0.8)
+    descriptionBg.setOrigin(0.5)
+    descriptionBg.setDepth(5)
+    
+    const descriptionText = this.add.text(400, 280, description, {
       fontSize: '18px',
-      fill: '#cccccc',
+      fill: '#000000',
       align: 'center',
       wordWrap: { width: 600 }
     }).setOrigin(0.5)
+    descriptionText.setDepth(6)
 
     // Botón de inicio
     const startButton = this.add.rectangle(400, 420, 200, 60, 0x3498db)
@@ -56,7 +81,7 @@ export class MainMenuScene extends PresentationScene {
     
     const startText = this.add.text(400, 420, 'INICIAR', {
       fontSize: '24px',
-      fill: '#ffffff'
+      fill: '#000000'
     }).setOrigin(0.5)
 
     startButton.on('pointerdown', () => {
@@ -71,10 +96,14 @@ export class MainMenuScene extends PresentationScene {
       startButton.setFillStyle(0x3498db)
     })
 
+    // Fondo blanco transparente para las instrucciones
+    const instructionsBg = this.add.rectangle(400, 520, 550, 60, 0xffffff, 0.8)
+    instructionsBg.setOrigin(0.5)
+    
     // Instrucciones
-    this.add.text(400, 520, 'Presiona ESPACIO o haz clic en INICIAR', {
+    const instructionsText = this.add.text(400, 520, 'Presiona ESPACIO o haz clic en INICIAR', {
       fontSize: '16px',
-      fill: '#888888'
+      fill: '#000000'
     }).setOrigin(0.5)
 
     // También permitir inicio con ESPACIO
