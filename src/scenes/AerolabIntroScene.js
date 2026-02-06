@@ -228,8 +228,8 @@ export class AerolabIntroScene extends PresentationScene {
     this.tweens.killAll()
     this.time.removeAllEvents()
     
-    // Transicionar directamente al desafío Valor1Challenge
-    this.transitionTo('Valor1Challenge')
+    // Transicionar directamente a la intro del primer reto
+    this.transitionTo('Valor1Intro')
   }
 
   startSequence() {
@@ -567,12 +567,12 @@ export class AerolabIntroScene extends PresentationScene {
 
       // Click para continuar
       buttonBg.on('pointerdown', () => {
-        this.transitionTo('Valor1Challenge')
+        this.transitionTo('Valor1Intro')
       })
 
       // También permitir continuar con ESPACIO
       this.input.keyboard.once('keydown-SPACE', () => {
-        this.transitionTo('Valor1Challenge')
+        this.transitionTo('Valor1Intro')
       })
 
       this.continueButton = buttonBg

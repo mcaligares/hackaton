@@ -16,7 +16,12 @@ export const sceneConfig = {
     {
       key: 'AerolabIntro',
       type: 'presentation',
-      nextScene: 'IntroStory'
+      nextScene: 'Valor1Intro'
+    },
+    {
+      key: 'Valor1Intro',
+      type: 'presentation',
+      nextScene: 'Valor1Challenge'
     },
     {
       key: 'IntroStory',

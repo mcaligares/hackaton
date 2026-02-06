@@ -7,14 +7,13 @@
 
 // Importar escenas de Valor1 cuando las crees
 import { Valor1ChallengeScene } from '../../scenes/Valor1ChallengeScene.js'
+import { Valor1IntroScene } from '../../scenes/valor-1/index.js'
 
 /**
  * Array de escenas de Valor1
  * Agrega tus nuevas escenas de Valor1 aquí
  */
 export const valor1Scenes = [
-  // Ejemplo:
-  // Valor1Scene,
-  // Valor1IntroScene,
+  Valor1IntroScene,
   Valor1ChallengeScene,
 ]
