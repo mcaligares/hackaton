@@ -1,6 +1,7 @@
 /**
  * Barrel export para todas las escenas
  */
+export { AerolabIntroScene } from './AerolabIntroScene.js'
 export { MainMenuScene } from './MainMenuScene.js'
 export { IntroStoryScene } from './IntroStoryScene.js'
 export { TutorialScene } from './TutorialScene.js'

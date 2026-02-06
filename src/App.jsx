@@ -5,6 +5,7 @@ import { SceneRouter, sceneConfig } from './core/router/index.js'
 
 // Importar todas las escenas
 import {
+  AerolabIntroScene,
   MainMenuScene,
   IntroStoryScene,
   TutorialScene,
@@ -37,6 +38,7 @@ function App() {
         }
       },
       scene: [
+        AerolabIntroScene,
         MainMenuScene,
         IntroStoryScene,
         TutorialScene,
@@ -65,7 +67,7 @@ function App() {
 
     // Cargar estado guardado
     const savedState = routerRef.current.loadState()
-    if (savedState) {
+    if (savedState && savedState.currentSceneIndex > 0) {
       // Iniciar desde la escena guardada
       const savedScene = sceneConfig.scenes[savedState.currentSceneIndex]
       if (savedScene) {

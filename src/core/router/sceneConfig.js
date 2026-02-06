@@ -11,6 +11,11 @@ export const sceneConfig = {
     {
       key: 'MainMenu',
       type: 'presentation',
+      nextScene: 'AerolabIntro'
+    },
+    {
+      key: 'AerolabIntro',
+      type: 'presentation',
       nextScene: 'IntroStory'
     },
     {

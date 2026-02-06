@@ -36,11 +36,34 @@ export class BaseSprite {
       ...config
     }
 
+    // Verificar que la textura existe antes de crear el sprite
+    if (!scene.textures.exists(spriteKey)) {
+      console.warn(`⚠️ Texture "${spriteKey}" not found. Available textures:`, Object.keys(scene.textures.list))
+      // Intentar usar una textura temporal si no existe
+      if (!scene.textures.exists('missing')) {
+        const graphics = scene.add.graphics()
+        graphics.fillStyle(0xff0000, 1)
+        graphics.fillRect(0, 0, 32, 48)
+        graphics.generateTexture('missing', 32, 48)
+        graphics.destroy()
+      }
+      spriteKey = 'missing'
+    } else {
+      console.log(`✅ Creating sprite with texture: "${spriteKey}"`)
+    }
+
     // Crear sprite con o sin física
     if (this.config.physics) {
       this.sprite = scene.physics.add.sprite(x, y, spriteKey)
     } else {
       this.sprite = scene.add.sprite(x, y, spriteKey)
+    }
+    
+    // Verificar que el sprite se creó con la textura correcta
+    if (this.sprite.texture.key !== spriteKey) {
+      console.error(`❌ Sprite created with wrong texture! Expected: "${spriteKey}", Got: "${this.sprite.texture.key}"`)
+      // Forzar la textura correcta
+      this.sprite.setTexture(spriteKey)
     }
 
     // Configurar propiedades básicas
@@ -127,6 +150,8 @@ export class BaseSprite {
   playAnimation(animKey, ignoreIfPlaying = false) {
     if (this.animations.has(animKey) && this.scene.anims.exists(animKey)) {
       this.sprite.anims.play(animKey, ignoreIfPlaying)
+    } else {
+      console.warn(`⚠️ Animation "${animKey}" not found for sprite with texture "${this.sprite.texture.key}"`)
     }
   }
 
