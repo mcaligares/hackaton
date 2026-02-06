@@ -35,6 +35,51 @@ export class Valor5Scene extends ChallengeScene {
       totalObstacles: 20,
     }
 
+    // Configuración de assets (fácil de cambiar cuando tengas los PNGs)
+    // Para usar PNGs, colócalos en /public/assets/valor-5/ con estos nombres:
+    // - valor5_background.png (fondo)
+    // - valor5_ground.png (suelo)
+    // - valor5_obstacle_1.png, valor5_obstacle_2.png, etc. (obstáculos - se seleccionan aleatoriamente)
+    // - valor5_boost_1.png, valor5_boost_2.png, etc. (boosts - se seleccionan aleatoriamente)
+    this.assets = {
+      // Fondo - si existe 'valor5_background.png', se usará, sino rectángulo azul
+      background: {
+        image: 'valor5_background',
+        fallbackColor: 0x87CEEB,
+        width: 800,
+        height: 600
+      },
+      // Suelo - si existe 'valor5_ground.png', se usará, sino rectángulo marrón
+      ground: {
+        image: 'valor5_ground',
+        fallbackColor: 0x8B4513,
+        width: 800,
+        height: 64
+      },
+      // Obstáculos - múltiples variantes (valor5_obstacle_1.png, valor5_obstacle_2.png, etc.)
+      // Se seleccionan aleatoriamente. Si no hay PNGs, usa rectángulo rojo
+      obstacle: {
+        baseName: 'valor5_obstacle',
+        variants: 0, // Número máximo de variantes a buscar (1 a 5)
+        fallbackColor: 0xFF0000,
+        width: 60,
+        height: 60
+      },
+      // Boosts - múltiples variantes (valor5_boost_1.png, valor5_boost_2.png, etc.)
+      // Se seleccionan aleatoriamente. Si no hay PNGs, usa rectángulo verde
+      boost: {
+        baseName: 'valor5_boost',
+        variants: 0, // Número máximo de variantes a buscar (1 a 5)
+        fallbackColor: 0x00FF00,
+        width: 40,
+        height: 40
+      }
+    }
+    
+    // Cache de variantes disponibles (se llena en preload)
+    this.availableObstacleVariants = []
+    this.availableBoostVariants = []
+
     // Estado del juego
     this.currentSpeed = 0
     this.distanceTraveled = 0
@@ -62,6 +107,52 @@ export class Valor5Scene extends ChallengeScene {
         this.load.image(`sprite_${i}`, `/assets/sprite_${i}.png`)
       }
     }
+
+    // Cargar assets de la escena (si existen)
+    // Los assets se cargan desde /public/assets/valor-5/
+    // Si no existen, se usarán los fallbacks (rectángulos de colores)
+    const assetPath = '/assets/valor-5'
+    
+    // Cargar fondo y suelo (assets únicos)
+    this.load.image(this.assets.background.image, `${assetPath}/${this.assets.background.image}.png`)
+      .on('fileerror', () => {
+        console.log(`Asset ${this.assets.background.image} no encontrado, usando fallback`)
+      })
+    
+    this.load.image(this.assets.ground.image, `${assetPath}/${this.assets.ground.image}.png`)
+      .on('fileerror', () => {
+        console.log(`Asset ${this.assets.ground.image} no encontrado, usando fallback`)
+      })
+    
+    // Cargar múltiples variantes de obstáculos (valor5_obstacle_1.png, valor5_obstacle_2.png, etc.)
+    for (let i = 1; i <= this.assets.obstacle.variants; i++) {
+      const obstacleKey = `${this.assets.obstacle.baseName}_${i}`
+      this.load.image(obstacleKey, `${assetPath}/${obstacleKey}.png`)
+        .on('filecomplete', () => {
+          // Si se carga exitosamente, agregarlo a las variantes disponibles
+          if (!this.availableObstacleVariants.includes(obstacleKey)) {
+            this.availableObstacleVariants.push(obstacleKey)
+          }
+        })
+        .on('fileerror', () => {
+          // Silenciosamente ignorar si no existe esta variante
+        })
+    }
+    
+    // Cargar múltiples variantes de boosts (valor5_boost_1.png, valor5_boost_2.png, etc.)
+    for (let i = 1; i <= this.assets.boost.variants; i++) {
+      const boostKey = `${this.assets.boost.baseName}_${i}`
+      this.load.image(boostKey, `${assetPath}/${boostKey}.png`)
+        .on('filecomplete', () => {
+          // Si se carga exitosamente, agregarlo a las variantes disponibles
+          if (!this.availableBoostVariants.includes(boostKey)) {
+            this.availableBoostVariants.push(boostKey)
+          }
+        })
+        .on('fileerror', () => {
+          // Silenciosamente ignorar si no existe esta variante
+        })
+    }
   }
 
   create() {
@@ -77,8 +168,12 @@ export class Valor5Scene extends ChallengeScene {
     this.lastSpacePress = 0
     this.spacePressInterval = 0
 
-    // Fondo
-    this.add.rectangle(400, 300, 800, 600, 0x87CEEB)
+    // Fondo (PNG si existe, sino rectángulo)
+    if (this.textures.exists(this.assets.background.image)) {
+      this.add.image(400, 300, this.assets.background.image)
+    } else {
+      this.add.rectangle(400, 300, this.assets.background.width, this.assets.background.height, this.assets.background.fallbackColor)
+    }
 
     // Crear suelo
     this.createGround()
@@ -116,9 +211,19 @@ export class Valor5Scene extends ChallengeScene {
   }
 
   createGround() {
-    this.ground = this.add.rectangle(400, 568, 800, 64, 0x8B4513)
+    const groundY = 568
+    const tileWidth = this.assets.ground.width
+    const tileHeight = this.assets.ground.height
+    
+    // Crear suelo principal (PNG si existe, sino rectángulo)
+    if (this.textures.exists(this.assets.ground.image)) {
+      this.ground = this.add.image(400, groundY, this.assets.ground.image)
+    } else {
+      this.ground = this.add.rectangle(400, groundY, tileWidth, tileHeight, this.assets.ground.fallbackColor)
+    }
+    
     this.physics.add.existing(this.ground, true)
-    this.ground.body.setSize(800, 64)
+    this.ground.body.setSize(tileWidth, tileHeight)
     
     // Crear grupo de plataformas para colisiones
     this.platforms = this.physics.add.staticGroup()
@@ -126,17 +231,25 @@ export class Valor5Scene extends ChallengeScene {
 
     // Crear suelo extendido para el movimiento
     this.groundTiles = []
-    const tileWidth = 800
     const tilesNeeded = Math.ceil(this.config.distanceToB / tileWidth) + 2
     
     for (let i = 0; i < tilesNeeded; i++) {
-      const tile = this.add.rectangle(
-        i * tileWidth + tileWidth/2,
-        568,
-        tileWidth,
-        64,
-        0x8B4513
-      )
+      let tile
+      if (this.textures.exists(this.assets.ground.image)) {
+        tile = this.add.image(
+          i * tileWidth + tileWidth/2,
+          groundY,
+          this.assets.ground.image
+        )
+      } else {
+        tile = this.add.rectangle(
+          i * tileWidth + tileWidth/2,
+          groundY,
+          tileWidth,
+          tileHeight,
+          this.assets.ground.fallbackColor
+        )
+      }
       this.groundTiles.push(tile)
     }
   }
@@ -207,11 +320,27 @@ export class Valor5Scene extends ChallengeScene {
       lastX = x
     }
     
-    // Crear obstáculos con posiciones aleatorias
+    // Crear obstáculos con posiciones aleatorias (PNG aleatorio si existe, sino rectángulo)
     obstaclePositions.forEach(pos => {
-      const obstacle = this.add.rectangle(pos.x, pos.y, 60, 60, 0xFF0000)
+      let obstacle
+      
+      // Seleccionar una variante aleatoria de obstáculo si hay disponibles
+      if (this.availableObstacleVariants.length > 0) {
+        const randomVariant = Phaser.Utils.Array.GetRandom(this.availableObstacleVariants)
+        obstacle = this.add.image(pos.x, pos.y, randomVariant)
+      } else {
+        // Usar fallback (rectángulo)
+        obstacle = this.add.rectangle(
+          pos.x, 
+          pos.y, 
+          this.assets.obstacle.width, 
+          this.assets.obstacle.height, 
+          this.assets.obstacle.fallbackColor
+        )
+      }
+      
       this.physics.add.existing(obstacle, true)
-      obstacle.body.setSize(60, 60)
+      obstacle.body.setSize(this.assets.obstacle.width, this.assets.obstacle.height)
       obstacle.setData('type', 'obstacle')
       obstacle.setData('obstacleType', pos.type) // Guardar el tipo para referencia
       this.obstacles.add(obstacle)
@@ -296,11 +425,27 @@ export class Valor5Scene extends ChallengeScene {
       }
     }
     
-    // Crear boosts con posiciones que no colisionan con obstáculos
+    // Crear boosts con posiciones que no colisionan con obstáculos (PNG aleatorio si existe, sino rectángulo)
     boostPositions.forEach(pos => {
-      const boost = this.add.rectangle(pos.x, pos.y, 40, 40, 0x00FF00)
+      let boost
+      
+      // Seleccionar una variante aleatoria de boost si hay disponibles
+      if (this.availableBoostVariants.length > 0) {
+        const randomVariant = Phaser.Utils.Array.GetRandom(this.availableBoostVariants)
+        boost = this.add.image(pos.x, pos.y, randomVariant)
+      } else {
+        // Usar fallback (rectángulo)
+        boost = this.add.rectangle(
+          pos.x, 
+          pos.y, 
+          this.assets.boost.width, 
+          this.assets.boost.height, 
+          this.assets.boost.fallbackColor
+        )
+      }
+      
       this.physics.add.existing(boost, true)
-      boost.body.setSize(40, 40)
+      boost.body.setSize(this.assets.boost.width, this.assets.boost.height)
       boost.setData('type', 'boost')
       boost.setData('boostType', pos.type) // Guardar el tipo para referencia
       this.boosts.add(boost)
