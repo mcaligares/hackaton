@@ -12,8 +12,8 @@ export class Valor5IntroScene extends MessageScene {
 
   init() {
     super.init({
-      title: 'Valor 5',
-      description: 'some value blablabla',
+      title: 'We move fast, not furious',
+      description: 'Carrera contrarreloj con obstáculos cambiantes',
       actionButtonText: 'Comenzar',
       nextScene: 'Valor5',
       backgroundColor: 0x1a1a1a,

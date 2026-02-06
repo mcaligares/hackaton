@@ -60,12 +60,13 @@ export class Valor5Scene extends ChallengeScene {
       // Se seleccionan aleatoriamente. Si no hay PNGs, usa rectángulo rojo
       obstacle: {
         baseName: 'valor5_obstacle',
-        variants: 0, // Número máximo de variantes a buscar (1 a 5)
+        variants: 5, // Número máximo de variantes a buscar (sprite_1, sprite_8, sprite_11, sprite_18, sprite_20)
         fallbackColor: 0xFF0000,
         width: 60,
         height: 60
       },
       // Boosts - múltiples variantes (valor5_boost_1.png, valor5_boost_2.png, etc.)
+      // También puede usar los boosters: chatgpt.png, claude.png, figma.png
       // Se seleccionan aleatoriamente. Si no hay PNGs, usa rectángulo verde
       boost: {
         baseName: 'valor5_boost',
@@ -73,12 +74,20 @@ export class Valor5Scene extends ChallengeScene {
         fallbackColor: 0x00FF00,
         width: 40,
         height: 40
+      },
+      // Boosters adicionales (chatgpt, claude, figma) - se pueden usar como boosts normales
+      boosterAssets: {
+        variants: ['chatgpt', 'claude', 'figma'], // Lista de boosters adicionales
+        fallbackColor: 0x00FF00,
+        width: 60,
+        height: 60
       }
     }
     
     // Cache de variantes disponibles (se llena en preload)
     this.availableObstacleVariants = []
     this.availableBoostVariants = []
+    this.availableBoosterAssets = [] // Boosters adicionales (chatgpt, claude, figma)
 
     // Estado del juego
     this.currentSpeed = 0
@@ -153,6 +162,28 @@ export class Valor5Scene extends ChallengeScene {
           // Silenciosamente ignorar si no existe esta variante
         })
     }
+    
+    // Cargar boosters adicionales desde valor-5 (copiados desde boosters/)
+    this.assets.boosterAssets.variants.forEach(variant => {
+      const boosterKey = `booster_${variant}`
+      // Cargar desde valor-5 (donde fueron copiados)
+      this.load.image(boosterKey, `${assetPath}/${variant}.png`)
+        .on('filecomplete', () => {
+          // Si se carga exitosamente, agregarlo a las variantes disponibles
+          if (!this.availableBoosterAssets.includes(boosterKey)) {
+            this.availableBoosterAssets.push(boosterKey)
+          }
+        })
+        .on('fileerror', () => {
+          // Si no existe en valor-5, intentar desde boosters como fallback
+          this.load.image(boosterKey, `/assets/boosters/${variant}.png`)
+            .on('filecomplete', () => {
+              if (!this.availableBoosterAssets.includes(boosterKey)) {
+                this.availableBoosterAssets.push(boosterKey)
+              }
+            })
+        })
+    })
   }
 
   create() {
@@ -328,6 +359,8 @@ export class Valor5Scene extends ChallengeScene {
       if (this.availableObstacleVariants.length > 0) {
         const randomVariant = Phaser.Utils.Array.GetRandom(this.availableObstacleVariants)
         obstacle = this.add.image(pos.x, pos.y, randomVariant)
+        // Reducir escala de los obstáculos
+        obstacle.setScale(0.6)
       } else {
         // Usar fallback (rectángulo)
         obstacle = this.add.rectangle(
@@ -340,7 +373,10 @@ export class Valor5Scene extends ChallengeScene {
       }
       
       this.physics.add.existing(obstacle, true)
-      obstacle.body.setSize(this.assets.obstacle.width, this.assets.obstacle.height)
+      // Ajustar tamaño del body según la escala
+      const scaledWidth = this.assets.obstacle.width * (obstacle.scaleX || 1)
+      const scaledHeight = this.assets.obstacle.height * (obstacle.scaleY || 1)
+      obstacle.body.setSize(scaledWidth, scaledHeight)
       obstacle.setData('type', 'obstacle')
       obstacle.setData('obstacleType', pos.type) // Guardar el tipo para referencia
       this.obstacles.add(obstacle)
@@ -429,10 +465,17 @@ export class Valor5Scene extends ChallengeScene {
     boostPositions.forEach(pos => {
       let boost
       
+      // Combinar todas las variantes disponibles (boosts normales + boosters adicionales)
+      const allBoostVariants = [...this.availableBoostVariants, ...this.availableBoosterAssets]
+      
       // Seleccionar una variante aleatoria de boost si hay disponibles
-      if (this.availableBoostVariants.length > 0) {
-        const randomVariant = Phaser.Utils.Array.GetRandom(this.availableBoostVariants)
+      if (allBoostVariants.length > 0) {
+        const randomVariant = Phaser.Utils.Array.GetRandom(allBoostVariants)
         boost = this.add.image(pos.x, pos.y, randomVariant)
+        // Ajustar escala si es un booster adicional (son más grandes)
+        if (this.availableBoosterAssets.includes(randomVariant)) {
+          boost.setScale(0.1) // Reducir tamaño de boosters (más pequeño)
+        }
       } else {
         // Usar fallback (rectángulo)
         boost = this.add.rectangle(
