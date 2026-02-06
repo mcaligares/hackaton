@@ -47,6 +47,9 @@ export class AerolabIntroScene extends PresentationScene {
     // Fondo oscuro elegante
     this.add.rectangle(400, 300, 800, 600, 0x0a0a0a)
 
+    // Crear botón SKIP (temporal, se quitará después)
+    this.createSkipButton()
+
     // Crear personajes
     this.createCharacters()
 
@@ -134,6 +137,56 @@ export class AerolabIntroScene extends PresentationScene {
     // Asegurar que estén en el suelo visualmente
     this.limpa.y = limpaY
     this.robert.y = robertY
+  }
+
+  createSkipButton() {
+    // Botón SKIP en la esquina superior derecha
+    const skipButtonBg = this.add.rectangle(750, 30, 80, 35, 0x666666, 0.7)
+    skipButtonBg.setInteractive({ useHandCursor: true })
+    skipButtonBg.setDepth(300)
+    skipButtonBg.setStrokeStyle(1, 0xffffff, 0.5)
+
+    const skipButtonText = this.add.text(750, 30, 'SKIP', {
+      fontSize: '14px',
+      fill: '#ffffff',
+      fontStyle: 'bold',
+      fontFamily: 'Arial'
+    })
+    skipButtonText.setOrigin(0.5)
+    skipButtonText.setDepth(301)
+
+    // Efecto hover
+    skipButtonBg.on('pointerover', () => {
+      skipButtonBg.setFillStyle(0x888888, 0.9)
+      skipButtonBg.setScale(1.05)
+    })
+
+    skipButtonBg.on('pointerout', () => {
+      skipButtonBg.setFillStyle(0x666666, 0.7)
+      skipButtonBg.setScale(1)
+    })
+
+    // Click para saltar intro
+    skipButtonBg.on('pointerdown', () => {
+      this.skipIntro()
+    })
+
+    // También permitir saltar con tecla S
+    this.input.keyboard.once('keydown-S', () => {
+      this.skipIntro()
+    })
+
+    this.skipButton = skipButtonBg
+    this.skipButtonText = skipButtonText
+  }
+
+  skipIntro() {
+    // Detener todas las animaciones y timers
+    this.tweens.killAll()
+    this.time.removeAllEvents()
+    
+    // Transicionar directamente al desafío Valor1Challenge
+    this.transitionTo('Valor1Challenge')
   }
 
   startSequence() {
@@ -441,12 +494,12 @@ export class AerolabIntroScene extends PresentationScene {
 
       // Click para continuar
       buttonBg.on('pointerdown', () => {
-        this.transitionTo('MainMenu')
+        this.transitionTo('Valor1Challenge')
       })
 
       // También permitir continuar con ESPACIO
       this.input.keyboard.once('keydown-SPACE', () => {
-        this.transitionTo('MainMenu')
+        this.transitionTo('Valor1Challenge')
       })
 
       this.continueButton = buttonBg

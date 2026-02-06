@@ -6,7 +6,7 @@
  */
 
 // Importar escenas de Valor1 cuando las crees
-// import { Valor1Scene, Valor1IntroScene } from '../../scenes/index.js'
+import { Valor1ChallengeScene } from '../../scenes/Valor1ChallengeScene.js'
 
 /**
  * Array de escenas de Valor1
@@ -16,4 +16,5 @@ export const valor1Scenes = [
   // Ejemplo:
   // Valor1Scene,
   // Valor1IntroScene,
+  Valor1ChallengeScene,
 ]

@@ -21,7 +21,13 @@ export const sceneConfig = {
     {
       key: 'IntroStory',
       type: 'presentation',
-      nextScene: 'Tutorial'
+      nextScene: 'Valor1Challenge'
+    },
+    {
+      key: 'Valor1Challenge',
+      type: 'challenge',
+      nextScene: 'Achievement1',
+      onComplete: 'Achievement1'
     },
     {
       key: 'Tutorial',
