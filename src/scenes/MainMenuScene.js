@@ -60,7 +60,7 @@ export class MainMenuScene extends PresentationScene {
     }).setOrigin(0.5)
 
     startButton.on('pointerdown', () => {
-      this.transitionTo('Valor2Intro')
+      this.transitionTo('AerolabIntro')
     })
 
     startButton.on('pointerover', () => {
@@ -79,7 +79,7 @@ export class MainMenuScene extends PresentationScene {
 
     // También permitir inicio con ESPACIO
     this.input.keyboard.once('keydown-SPACE', () => {
-      this.transitionTo('Valor2Intro')
+      this.transitionTo('AerolabIntro')
     })
 
     // Mostrar atajos de escenas si está activado

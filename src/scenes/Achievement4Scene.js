@@ -11,9 +11,9 @@ export class Achievement4Scene extends PresentationScene {
 
   init(data) {
     this.achievementData = data || {
-      title: '¡Valor Desbloqueado!',
+      title: '¡Felicidades!',
       valorName: 'We aren\'t afraid to fuck up',
-      description: 'Aprendiste que el fracaso es parte del camino al éxito.\nCada error es una oportunidad de aprendizaje.',
+      description: 'Has completado todos los desafíos que representan los valores de Aerolab!\n¡Ya estás listo para ser Aerolaber!',
       message: 'Failure is part of learning. Keep going.'
     }
   }
@@ -111,12 +111,15 @@ export class Achievement4Scene extends PresentationScene {
 
     // Descripción
     const description = this.add.text(400, 330, this.achievementData.description, {
-      fontSize: '16px',
-      fill: '#ffffff',
+      fontSize: '22px',
+      fill: '#ffd700',
       fontFamily: 'Arial',
+      fontStyle: 'bold',
       align: 'center',
-      lineSpacing: 8,
-      wordWrap: { width: 600 }
+      lineSpacing: 10,
+      wordWrap: { width: 650 },
+      stroke: '#000000',
+      strokeThickness: 2
     }).setOrigin(0.5)
 
     description.setAlpha(0)
@@ -179,8 +182,8 @@ export class Achievement4Scene extends PresentationScene {
 
     // Continuar con ESPACIO - ir a la siguiente escena del juego
     this.input.keyboard.once('keydown-SPACE', () => {
-      // Transicionar a la siguiente escena (puede ser el siguiente desafío o historia)
-      this.transitionTo('Valor5Intro') // O la escena que corresponda
+      // Transicionar directamente al desafío Valor5
+      this.transitionTo('Valor5')
     })
   }
 

@@ -12,15 +12,17 @@ export class Valor5CompletedScene extends MessageScene {
 
   init() {
     super.init({
-      title: '¡Misión Completada!',
-      description: '¡Felicitaciones! Has completado exitosamente el desafío del Valor 5. Has demostrado determinación y perseverancia.',
+      title: '🏆 ¡Felicidades! 🏆',
+      description: 'Has completado todos los desafíos que representan los valores de Aerolab!\n¡Ya estás listo para ser Aerolaber!',
       actionButtonText: 'Volver al Menú',
       nextScene: 'MainMenu',
       backgroundColor: 0x0f2c1a, // Fondo más oscuro/verde
-      titleColor: '#44ff44',
-      descriptionColor: '#cccccc',
+      titleColor: '#ffd700',
+      descriptionColor: '#ffffff',
       buttonColor: 0x27ae60, // Verde
-      buttonHoverColor: 0x229954 // Verde oscuro
+      buttonHoverColor: 0x229954, // Verde oscuro
+      titleFontSize: '48px',
+      descriptionFontSize: '24px'
     })
   }
 }

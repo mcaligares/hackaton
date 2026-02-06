@@ -96,7 +96,7 @@ export class AchievementScene extends PresentationScene {
 
     // Continuar con ESPACIO
     this.input.keyboard.once('keydown-SPACE', () => {
-      this.transitionTo('Story1')
+      this.transitionTo('Valor2Intro')
     })
   }
 }

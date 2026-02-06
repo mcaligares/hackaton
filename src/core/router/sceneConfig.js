@@ -43,7 +43,7 @@ export const sceneConfig = {
     {
       key: 'Achievement1',
       type: 'presentation',
-      nextScene: 'Story1'
+      nextScene: 'Valor2Intro'
     },
     {
       key: 'Story1',

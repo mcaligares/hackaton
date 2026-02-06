@@ -488,6 +488,16 @@ export class Valor5Scene extends ChallengeScene {
   }
 
   createUI() {
+    // Mensaje de instrucción para presionar espacio
+    this.spaceInstructionText = this.add.text(400, 30, 'Presiona ESPACIO repetidamente para acelerar', {
+      fontSize: '20px',
+      fill: '#FFFF00',
+      stroke: '#000000',
+      strokeThickness: 3,
+      fontStyle: 'bold'
+    })
+    this.spaceInstructionText.setOrigin(0.5, 0.5)
+
     // Tiempo restante
     this.timeText = this.add.text(20, 20, '', {
       fontSize: '24px',

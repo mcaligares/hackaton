@@ -10,11 +10,13 @@
  */
 
 import { Valor4ChallengeScene, Achievement4Scene } from '../../scenes/index.js'
+import { Valor4IntroScene } from '../../scenes/valor-4/index.js'
 
 /**
  * Array de escenas de Valor4
  */
 export const valor4Scenes = [
+  Valor4IntroScene,
   Valor4ChallengeScene,
   Achievement4Scene
 ]

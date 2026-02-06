@@ -13,9 +13,9 @@ export class Valor2CompletedScene extends MessageScene {
   init() {
     super.init({
       title: '¡Misión Completada!',
-      description: '¡Felicitaciones! Has completado exitosamente el desafío del Valor 2. Has interactuado con todos los personajes.',
-      actionButtonText: 'Volver al Menú',
-      nextScene: 'MainMenu',
+      description: '¡Felicitaciones! Has completado exitosamente el desafío del Valor 2 y 3. \n "We love a good collab & We want our team to feel supported"\n Has interactuado con todos los personajes.',
+      actionButtonText: 'Avanzar',
+      nextScene: 'Valor4Intro',
       backgroundColor: 0x0f2c1a, // Fondo más oscuro/verde
       titleColor: '#44ff44',
       descriptionColor: '#cccccc',
